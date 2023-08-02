@@ -70,7 +70,7 @@
                                         <p class="text-danger">{{ $message }}</p>
                                     @enderror
                                     <textarea id="summernote" id="body" name="body">
-                                        {{ old('body') }}
+                                        {{ old('body', $story->body) }}
                                     </textarea>
                                 </div>
                                 <button type="submit" class="btn btn-primary">Edit Article</button>
@@ -86,8 +86,10 @@
 
 @section('page_script')
     <script>
-        $('.select2').select2();
-        $('#summernote').summernote();
+        $(document).ready(function() {
+            $('.select2').select2();
+            $('#summernote').summernote();
+        });
 
         const title = document.querySelector('#title');
         const slug = document.querySelector('#slug');

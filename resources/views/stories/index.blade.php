@@ -6,6 +6,14 @@
                 <div class="row">
                     <div class="col-12">
                         <div class="card p-5">
+                            @if (session()->has('success'))
+                                <div class="alert alert-success col-12 alert-dismissible fade show" role="alert">
+                                    {{ session('success') }}
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                            @endif
                             <div class="card-datatable table-responsive table-rounded">
                                 <table class="table" id="datatables-ajax">
                                     <thead>
@@ -135,7 +143,7 @@
                     }]
                 });
             }
-            $("#create").html('Add New');
+            $("#create").html('<i class="fas fa-plus"></i> Add New');
             $("#create").attr('style', 'margin-bottom: 7px');
             $("#create").attr('onClick', 'redirectCreate()');
         });
