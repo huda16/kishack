@@ -189,10 +189,8 @@ class UserController extends Controller
         // }
         $result = User::where('id', $user->id)->update($data);
         if ($request->role_id != $user->role_id) {
-            $roleOld = Role::where('id', $user->role_id)->first();
-            $result->revokeRole($roleOld->name);
             $role = Role::where('id', $data['role_id'])->first();
-            $result->assignRole($role->name);
+            $user->roles()->sync([$role->id]);
         }
 
         return response()->json([

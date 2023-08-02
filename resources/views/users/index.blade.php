@@ -107,7 +107,6 @@
                         <div class="form-group">
                             <label for="role_id">Role</label>
                             <select class="select2 form-control" id="role_id" name="role_id" required>
-                                <option value="">--- Select ---</option>
                                 @foreach ($roles as $role)
                                     <option value="{{ $role->id }}">{{ $role->name }}</option>
                                 @endforeach
@@ -172,7 +171,7 @@
                     }]
                 });
             }
-            $("#create").html('Add a User');
+            $("#create").html('<i class="fas fa-plus"></i> Add New');
             $("#create").attr('style', 'margin-bottom: 7px');
             $("#create").attr('data-toggle', 'modal');
             $("#create").attr('data-target', '#modal-form');
@@ -197,6 +196,7 @@
             password.value = '';
             role.value = '';
             btnSubmit.checked = false;
+            $('.select2').select2();
 
             submit();
         });
@@ -213,6 +213,7 @@
 
             $('#modal-title').text('Edit Post');
             const idForm = $('form#form_data').attr('id', 'form_edit_data');
+            $('.select2').select2();
 
             await fetch(`/users/${id}/edit`)
                 .then(response => response.json())
@@ -223,6 +224,7 @@
                     password.value = '';
                     role.value = response.data.role_id;
                 });
+            $('.select2').select2();
             submitEdit();
         });
 
