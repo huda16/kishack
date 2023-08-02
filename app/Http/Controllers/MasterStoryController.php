@@ -190,7 +190,9 @@ class MasterStoryController extends Controller
         }
 
         Story::destroy($story->id);
-        Storage::delete($story->image);
+        if ($story->image) {
+            Storage::delete($story->image);
+        }
 
         return response()->json([
             "statusCode" => 200,
