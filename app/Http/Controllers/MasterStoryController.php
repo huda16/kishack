@@ -4,9 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Story;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 use Cviebrock\EloquentSluggable\Services\SlugService;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -24,12 +27,13 @@ class MasterStoryController extends Controller
      */
     public function index(Request $request)
     {
+        $user = Auth::user();
         $data = [
             'title' => 'Master Data',
             'subtitle' => 'List Article'
         ];
 
-        $stories = Story::all();
+        $stories = Story::select()->where('user_id', $user->id)->latest()->get();
 
         foreach ($stories as $story) {
             $category = Category::where('id', $story->category_id)->first();
@@ -69,6 +73,7 @@ class MasterStoryController extends Controller
      */
     public function store(Request $request)
     {
+        $user = Auth::user();
         $validatedData = $request->validate([
             'title' => 'required|max:255',
             'slug' => 'required|unique:stories',
@@ -81,7 +86,7 @@ class MasterStoryController extends Controller
             $validatedData['image'] = $request->file('image')->store('story-images');
         }
 
-        $validatedData['user_id'] = auth()->user()->id;
+        $validatedData['user_id'] = $user->id;
         $validatedData['excerpt'] = Str::limit(strip_tags($request->body), 200);
 
         Story::create($validatedData);
@@ -95,6 +100,11 @@ class MasterStoryController extends Controller
     public function show(Story $story, $slug)
     {
         $story = Story::where('slug', $slug)->first();
+        $user = User::where('id', Auth::user()->id)->first();
+
+        if (!Gate::allows('story', $story) && !$user->hasRole('Super Admin')) {
+            abort(403);
+        }
         $data = [
             'title' => 'Master Data',
             'subtitle' => 'Detail Article',
@@ -110,6 +120,12 @@ class MasterStoryController extends Controller
     public function edit(Story $story, $slug)
     {
         $story = Story::where('slug', $slug)->first();
+        $user = User::where('id', Auth::user()->id)->first();
+
+        if (!Gate::allows('story', $story) && !$user->hasRole('Super Admin')) {
+            abort(403);
+        }
+
         $data = [
             'title' => 'Master Data',
             'subtitle' => 'Edit Article',
@@ -126,6 +142,12 @@ class MasterStoryController extends Controller
     public function update(Request $request, Story $story, $slug)
     {
         $story = Story::where('slug', $slug)->first();
+        $user = User::where('id', Auth::user()->id)->first();
+
+        if (!Gate::allows('story', $story) && !$user->hasRole('Super Admin')) {
+            abort(403);
+        }
+
         $rules = [
             'title' => 'required|max:255',
             'category_id' => 'required',
@@ -161,6 +183,12 @@ class MasterStoryController extends Controller
     public function destroy(Story $story, $id)
     {
         $story = Story::where('id', $id)->first();
+        $user = User::where('id', Auth::user()->id)->first();
+
+        if (!Gate::allows('story', $story) && !$user->hasRole('Super Admin')) {
+            abort(403);
+        }
+
         Story::destroy($story->id);
         Storage::delete($story->image);
 
